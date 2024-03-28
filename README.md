@@ -1,27 +1,29 @@
 # Resume Roast
 
-A React.js powered Webapp using the [Dropbox API](https://www.dropbox.com/developers)
+A React.js powered Webapp using the [Dropbox OAuth API](https://www.dropbox.com/developers)
 and [Disqus](https://disqus.com) for getting feedback on your resume. Upload
-your resume to Dropbox using our OAuth API frontend, then leave feedback on
-other people's resumes using the Disqus thread linked to each document.
+your resume to Dropbox using the app, then leave feedback on other users'
+resumes using the Disqus thread linked to each document.
 
 ## Configuration and Hosting
 
-:octocat: **> git clone && cd ResumeRoast/resume-roast**
+:octocat: **> git clone**
 
 :package: **> npm i**
 
-:open_file_folder: **> mkdir thumbnails**
+:open_file_folder: **> mkdir thumbnails && touch data.json**
+
+`data.json` will hold your Dropbox links, and `thumbnails` will store resume thumbnails.
 
 :page_facing_up: **Create .env.local**
 ```toml
-DROPBOX_CLIENT_SECRET="{Get this from Dropbox}" # Or from Will if you are on the team
-VITE_DROPBOX_CLIENT_ID="{This is also from Dropbox}" # Or from Will if you are on the team
+DROPBOX_CLIENT_SECRET="{Get this from Dropbox}"
+VITE_DROPBOX_CLIENT_ID="{This is also from Dropbox}"
 VITE_OAUTH_REDIRECT_URL="{Your absolute path to /login (Like http://localhost:5173/login)}"
 ```
 :runner: **Run this command!**
 ```bash
-npm run host # Runs the server on port 8000
+npm run host # Runs the server on port 5173
 ```
 ## Routes
 
