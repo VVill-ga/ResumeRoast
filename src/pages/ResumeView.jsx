@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import { DiscussionEmbed } from "disqus-react";
 import { useParams } from "react-router-dom";
@@ -55,7 +55,7 @@ export default function ResumeView(){
                         shortname={import.meta.env.VITE_DISQUS_SHORTNAME}
                         config={
                             {
-                                url: window.location.host + window.location.pathname,
+                                url: window.location.origin + window.location.pathname,
                                 identifier: id,
                                 title: "Resume Comments",
                                 language: 'en_US'
