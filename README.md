@@ -20,6 +20,7 @@ resumes using the Disqus thread linked to each document.
 DROPBOX_CLIENT_SECRET="{Get this from Dropbox}"
 VITE_DROPBOX_CLIENT_ID="{This is also from Dropbox}"
 VITE_OAUTH_REDIRECT_URL="{Your absolute path to /login (Like http://localhost:5173/login)}"
+VITE_DISQUS_SHORTNAME="{Get this from Disqus}"
 ```
 :runner: **Run this command!**
 ```bash
