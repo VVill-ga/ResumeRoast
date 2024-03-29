@@ -42,7 +42,7 @@ export default function ResumeView(){
                         config={
                             {
                                 url: window.location.host + window.location.pathname,
-                                identifier: dqid,
+                                identifier: id,
                                 title: "Resume Comments",
                                 language: 'en_US'
                             }

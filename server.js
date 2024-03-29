@@ -12,7 +12,7 @@ const client_secret = process.env.DROPBOX_CLIENT_SECRET
 const redirect_uri = process.env.VITE_OAUTH_REDIRECT_URL
 
 const app = express()
-const port = 5173
+const port = 8000
 let pdfLinks = JSON.parse(fs.readFileSync('data.json'));
 let tokens = {};
 

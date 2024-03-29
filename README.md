@@ -11,7 +11,7 @@ resumes using the Disqus thread linked to each document.
 
 :package: **> npm i**
 
-:open_file_folder: **> mkdir thumbnails && touch data.json**
+:open_file_folder: **> mkdir thumbnails && echo {} > data.json**
 
 `data.json` will hold your Dropbox links, and `thumbnails` will store resume thumbnails.
 
