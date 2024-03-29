@@ -4,16 +4,12 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import bodyParser from 'body-parser'
 import pdf2img from 'pdf-img-convert'
-import { Buffer } from 'buffer';
 
 dotenv.config({ path: ".env.local" })
 
 const client_id = process.env.VITE_DROPBOX_CLIENT_ID
 const client_secret = process.env.DROPBOX_CLIENT_SECRET
 const redirect_uri = process.env.VITE_OAUTH_REDIRECT_URL
-
-console.log("== client_id:", client_id)
-console.log("== client_secret:", client_secret)
 
 const app = express()
 const port = 5173
@@ -170,21 +166,8 @@ app.get("/api/thumbnail", async (req, res) => {
     else
         res.status(404).send()
 })
-app.get("/login", async (req, res) => {
+app.get("*", async (req, res) => {
     res.sendFile("dist/index.html", { root : process.cwd()});
 })
-app.get("/r", async (req, res) => {
-    res.sendFile("dist/index.html", { root : process.cwd()});
-})
-app.get("/me", async (req, res) => {
-    res.sendFile("dist/index.html", { root : process.cwd()});
-})
-app.get("/about", async (req, res) => {
-    res.sendFile("dist/index.html", { root : process.cwd()});
-})
-app.get('/', function (req, res) {
-  res.sendFile(path.join(process.cwd(), 'dist', 'index.html'));
-});
-
 
 app.listen(port, () => console.log(`API server listening on port ${port}`))
