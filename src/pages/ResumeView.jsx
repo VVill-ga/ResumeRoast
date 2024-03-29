@@ -8,6 +8,20 @@ import "./ResumeView.css"
 import './displayPDF.css'
 
 export default function ResumeView(){
+
+    useEffect(() => {
+        const script = document.createElement('script');
+
+        script.src = "https://www.dropbox.com/static/api/2/dropins.js";
+        script.async = true;
+        script.id = "dropboxjs";
+        script.setAttribute("data-app-key", "0hl4iasbytbli9s");
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
+        }
+    }, []);
+
     const {id} = useParams()
     const [pdfLink, setPdfLink] = useState("")
     const fetchData = async () => {
@@ -50,7 +64,6 @@ export default function ResumeView(){
                     />
                 </div>
             </div>
-            <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="0hl4iasbytbli9s"></script>
         </>
     )
 }
