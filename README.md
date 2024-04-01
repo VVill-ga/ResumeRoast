@@ -11,10 +11,6 @@ resumes using the Disqus thread linked to each document.
 
 :package: **> npm i**
 
-:open_file_folder: **> mkdir thumbnails && echo {} > data.json**
-
-`data.json` will hold your Dropbox links, and `thumbnails` will store resume thumbnails.
-
 :page_facing_up: **Create .env.local**
 ```toml
 DROPBOX_CLIENT_SECRET="{Get this from Dropbox}"
@@ -24,7 +20,7 @@ VITE_DISQUS_SHORTNAME="{Get this from Disqus}"
 ```
 :runner: **Run this command!**
 ```bash
-npm run host # Runs the server on port 5173
+npm run build && npm run host # Builds and runs the server on port 5173
 ```
 ## Routes
 

@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import bodyParser from 'body-parser'
 import pdf2img from 'pdf-img-convert'
+import sqlite3 from 'sqlite3'
 
 dotenv.config({ path: ".env.local" })
 
@@ -13,8 +14,16 @@ const redirect_uri = process.env.VITE_OAUTH_REDIRECT_URL
 
 const app = express()
 const port = 8000
-let pdfLinks = JSON.parse(fs.readFileSync('data.json'));
+let db = new sqlite3.Database('./links.db', (err) => {console.log("Error loading database: " + err)});
+if(!fs.existsSync("./links.db")){
+    db.serialize(() => {
+        db.run("CREATE TABLE IF NOT EXISTS links (id TEXT PRIMARY KEY, links TEXT)")
+        db.run("CREATE TABLE IF NOT EXISTS userinfo (id TEXT PRIMARY KEY, name TEXT)")
+    })
+}
 let tokens = {};
+if(!fs.existsSync("./thumbnails"))
+    fs.mkdirSync("./thumbnails")
 
 app.use(express.json())
 app.use(bodyParser.raw({type: 'application/octet-stream', limit: '150mb'}))
@@ -136,26 +145,48 @@ app.post("/api/upload", async (req, res) => {
                 }
             )
 
-            if(!pdfLinks[tokens[code].id])
-                pdfLinks[tokens[code].id] = []
-            pdfLinks[tokens[code].id].unshift(shareResBody.url)
-            // Update """database"""
-            fs.writeFileSync('data.json', JSON.stringify(pdfLinks));
+            // Update database
+            let version = -1;
+            db.serialize(() => {
+                db.get("SELECT pdfs FROM links WHERE id = ?", [tokens[code].id], (err, pdfs) => {
+                    if(!err)
+                        db.run("UPDATE links SET pdfs = ? WHERE id = ?", [shareResBody.url + pdfs ? ',' + pdfs : "", tokens[code].id]);
+                    else
+                        console.log("Error updating links database: " + err);
+
+                    version = pdfs? pdfs.split(",").length + 1 : 1;
+                })
+            })
         }
 
-        return res.status(200).json({link: shareResBody.url, version: pdfLinks[tokens[code].id].length})
+        return res.status(200).json({link: shareResBody.url, version: version})
     }
 });
 app.get("/api/allpdfs", async (req, res) => {
     let links = []
-    for(let id in pdfLinks)
-            links.push({id, link: pdfLinks[id][0]})
+    db.serialize(() => {
+        db.get("SELECT * FROM links", [tokens[code].id], (err, rows) => {
+            for(let row of rows){
+                links.push({id: row.id, link: row.pdfs.split(",")[0]});
+            }
+        })
+    })
     res.status(200).send(links)
 });
 app.get("/api/pdf", async (req, res) => {
     const { id, version } = req.query
-    if(pdfLinks[id][version? version : 0])
-        res.status(200).send({link: pdfLinks[id][version? version : 0]})
+    let link = "";
+    db.serialize(() => {
+        db.get("SELECT pdfs FROM links WHERE id = ?", id, (err, pdfs) => {
+            if(err)
+                console.log("Error finding pdf version " + version + " for user " + id);
+            else
+                link = pdfs.split(",")[version];
+        })
+    })
+
+    if(link)
+        res.status(200).send({link: link})
     else
         res.status(404).send()
 });
