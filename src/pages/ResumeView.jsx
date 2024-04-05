@@ -4,11 +4,9 @@ import TopBar from "./TopBar";
 import { DiscussionEmbed } from "disqus-react";
 import { useParams } from "react-router-dom";
 
-import "./ResumeView.css"
-import './displayPDF.css'
 
 export default function ResumeView(){
-
+    // Add dropbox viewer
     useEffect(() => {
         const script = document.createElement('script');
 
@@ -24,6 +22,8 @@ export default function ResumeView(){
 
     const {id} = useParams()
     const [pdfLink, setPdfLink] = useState("")
+
+    // Get PDF link
     const fetchData = async () => {
         console.log(useParams())
         try {
@@ -35,7 +35,6 @@ export default function ResumeView(){
             console.error('Error fetching data: ', error);
         }
     };
-
     fetchData();
 
     return(
@@ -43,12 +42,7 @@ export default function ResumeView(){
             <TopBar />
             <div className="ResumeViewContainer">
                 <div className="column">
-                    <div>
-                        <a 
-                            href={pdfLink} 
-                            class="dropbox-embed"
-                        ></a>
-                    </div>
+                    <a href={pdfLink} class="dropbox-embed"></a>
                 </div>
                 <div className="column">
                     <DiscussionEmbed
