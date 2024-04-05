@@ -14,11 +14,10 @@ const redirect_uri = process.env.VITE_OAUTH_REDIRECT_URL
 
 const app = express()
 const port = 8000
-let db = new sqlite3.Database('./links.db', (err) => {console.log("Error loading database: " + err)});
+let db = new sqlite3.Database('./links.db', (err) => {if(err)console.log("Error loading database: " + err)});
 if(!fs.existsSync("./links.db")){
     db.serialize(() => {
-        db.run("CREATE TABLE IF NOT EXISTS links (id TEXT PRIMARY KEY, links TEXT)")
-        db.run("CREATE TABLE IF NOT EXISTS userinfo (id TEXT PRIMARY KEY, name TEXT)")
+        db.run("CREATE TABLE IF NOT EXISTS data (id TEXT PRIMARY KEY, name TEXT, links TEXT)")
     })
 }
 let tokens = {};
@@ -122,6 +121,7 @@ app.post("/api/upload", async (req, res) => {
         }
         const shareRes= await fetch(shareURL, shareOptions);
         const shareResBody = await shareRes.json()
+        let version = -1;
         //If the pdf is not changed, the response body won't have a URL
         if(!shareResBody.url)
             return res.status(208).send()
@@ -146,49 +146,50 @@ app.post("/api/upload", async (req, res) => {
             )
 
             // Update database
-            let version = -1;
             db.serialize(() => {
-                db.get("SELECT pdfs FROM links WHERE id = ?", [tokens[code].id], (err, pdfs) => {
-                    if(!err)
-                        db.run("UPDATE links SET pdfs = ? WHERE id = ?", [shareResBody.url + pdfs ? ',' + pdfs : "", tokens[code].id]);
+                db.get("SELECT links FROM data WHERE id=?", [tokens[code].id], (err, entry) => {
+                    if(!err){
+                        if(!entry || !entry.links)
+                            db.run("INSERT INTO data (id, links) VALUES (?, ?)", tokens[code].id, shareResBody.url)
+                        else
+                            db.run("UPDATE data SET links=? WHERE id=?", [shareResBody.url + entry.links ? ',' + entry.links : "", tokens[code].id]);
+                    }
                     else
                         console.log("Error updating links database: " + err);
 
-                    version = pdfs? pdfs.split(",").length + 1 : 1;
+                    version = (entry && entry.links)? entry.links.split(",").length + 1 : 1;
+                    return res.status(200).json({link: shareResBody.url, version: version})
                 })
             })
         }
-
-        return res.status(200).json({link: shareResBody.url, version: version})
     }
 });
 app.get("/api/allpdfs", async (req, res) => {
     let links = []
     db.serialize(() => {
-        db.get("SELECT * FROM links", [tokens[code].id], (err, rows) => {
-            for(let row of rows){
-                links.push({id: row.id, link: row.pdfs.split(",")[0]});
-            }
+        db.get("SELECT * FROM data", (err, rows) => {
+            if(rows && rows.links) //Rows is a single pdf
+                links.push({id: rows.id, link: rows.links.split(",")[0]});
+            else if(rows)
+                for(let row of rows)
+                    links.push({id: row.id, link: row.links.split(",")[0]});
+            res.status(links? 200:204).send(links)
         })
     })
-    res.status(200).send(links)
 });
 app.get("/api/pdf", async (req, res) => {
     const { id, version } = req.query
     let link = "";
     db.serialize(() => {
-        db.get("SELECT pdfs FROM links WHERE id = ?", id, (err, pdfs) => {
-            if(err)
-                console.log("Error finding pdf version " + version + " for user " + id);
+        db.get("SELECT links FROM data WHERE id = ?", id, (err, pdfs) => {
+            if(err || !pdfs.links.split(",")[version||0]){
+                console.log("Error finding pdf version " + (version||0) + " for user " + id);
+                res.status(404).send()
+            }
             else
-                link = pdfs.split(",")[version];
+                res.status(200).send({link: pdfs.links.split(",")[version||0]})
         })
     })
-
-    if(link)
-        res.status(200).send({link: link})
-    else
-        res.status(404).send()
 });
 app.get("/api/thumbnail", async (req, res) => {
     const {id} = req.query

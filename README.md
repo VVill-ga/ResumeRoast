@@ -154,13 +154,16 @@ the server can identify each client. The structure of `tokens` is as so:
 
 **:chains: Public PDF Links**
 
-A similar object is kept to store the links we generate for each uploaded
-pdf, with the biggest difference being that this object is instantiated by
-reading in `data.json`, and each time a new pdf is added, we modify 
-`data.json`. The structure of `pdfLinks`/`data.json` is as so:
+An SQLite Database (`data.db`)is maintained to track pdf links for all users.
+This database contains a single table called `data`, and each row contains a
+Dropbox User ID which acts as the primary key `id`, the name associated with 
+the Dropbox account, and a string of comma deliminated pdf links `links`, 
+which is ordered such that the latest resume is in the front. 
 ```json
 {
-    "{Dropbox User ID}": ["{Array of pdf links, with latest at the start}"]
+    "id": "{Dropbox User ID}",
+    "name": "{Dropbox Username}",
+    "links": "{pdfLink1,pdfLink2,pdfLink3...}"
 }
 ```
 
