@@ -1,12 +1,20 @@
 import { useState, useCallback } from 'react'
 import { useCookies } from 'react-cookie'
 import { useDropzone } from 'react-dropzone'
-import {NavLink} from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+import { css } from '@emotion/react'
 
-export default function Login() {
+import Loading from '../components/Loading'
+import ResumeView from './ResumeView'
+
+export default function Upload() {
     const [ error, setError ] = useState("")
+    const [ loading, setLoading ] = useState(false)
     const [ success, setSuccess ] = useState(false)
-    const [ cookies, setCookie ] = useCookies(["authCode"])
+    const [ cookies, setCookie ] = useCookies(["authCode", "id"])
+
+    const style = css`
+    `
     
     const onDrop = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0]
@@ -15,8 +23,8 @@ export default function Login() {
         reader.onerror = () => console.log("File Reading has failed")
         reader.onload = () => {
             const bytes = new Uint8Array(reader.result)
-            console.log(bytes);
             async function uploadPDF(bytes) {
+                setLoading(true)
                 const res = await fetch("/api/upload", {
                     method: "POST",
                     body: bytes,
@@ -32,6 +40,7 @@ export default function Login() {
                     console.log("Version: " + res.body.version)
                     setSuccess(true)
                 }
+                setLoading(false)
             }
             if (bytes) {
                 uploadPDF(bytes)
@@ -40,8 +49,11 @@ export default function Login() {
         reader.readAsArrayBuffer(file);
     }, [cookies.authCode])
 
+    if(loading)
+        return <Loading />
+
     const {getRootProps, getInputProps} = useDropzone({
-        accept: { 
+        accept: {
             'application/pdf': ['.pdf']
         },
         maxFiles: 1,
@@ -49,13 +61,16 @@ export default function Login() {
     })
 
     return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <p>
-                {success && <NavLink to = "/"> File uploaded! Check Console. </NavLink>}
-                {error && !success && "Error uploading resume."}
-                {!success && !error && "Drag 'n' drop your resume here, or click to select the file"}
-            </p>
-        </div>
+        <main css={style}>
+            <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>
+                    { success && <NavLink to = "/"> File uploaded! </NavLink>}
+                    {!success &&  error && "Error uploading resume, please try again"}
+                    {!success && !error && "Drag 'n' drop your resume here, or click to select the file"}
+                </p>
+            </div>
+            {cookies.id && <ResumeView />}
+        </main>
     )
 }

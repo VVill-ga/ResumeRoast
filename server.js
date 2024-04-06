@@ -58,7 +58,7 @@ app.post("/api/tokenExchange", async (req, res) => {
             tokens[code].id    = dropboxResBody.account_id
             // Delete token association when the token expires
             setTimeout(()=>{delete tokens[code]}, dropboxResBody.expires_in * 1000)
-            res.status(200).send()
+            res.status(200).send({id: dropboxResBody.account_id})
         } else {
             res.status(401).send({
                 err: dropboxResBody.error_description
@@ -182,7 +182,7 @@ app.get("/api/pdf", async (req, res) => {
     let link = "";
     db.serialize(() => {
         db.get("SELECT links FROM data WHERE id = ?", id, (err, pdfs) => {
-            if(err || !pdfs.links.split(",")[version||0]){
+            if(err || !pdfs || !pdfs.links || !pdfs.links.split(",")[version||0]){
                 console.log("Error finding pdf version " + (version||0) + " for user " + id);
                 res.status(404).send()
             }

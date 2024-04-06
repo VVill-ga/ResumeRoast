@@ -1,31 +1,22 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import TopBar from "./TopBar";
 import { DiscussionEmbed } from "disqus-react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { css } from "@emotion/react";
+import { useCookies } from "react-cookie";
 
 
 export default function ResumeView(){
-    // Add dropbox viewer
-    useEffect(() => {
-        const script = document.createElement('script');
+    const location = useLocation();
+    const [cookies] = useCookies(["id"]);
+    const {id} = location.pathname == '/me'? cookies : useParams();
+    console.log(location.pathname, id, cookies.id);
+    const [pdfLink, setPdfLink] = useState("");
+    const style = css`
 
-        script.src = "https://www.dropbox.com/static/api/2/dropins.js";
-        script.async = true;
-        script.id = "dropboxjs";
-        script.setAttribute("data-app-key", "0hl4iasbytbli9s");
-        document.body.appendChild(script);
-        return () => {
-            document.body.removeChild(script);
-        }
-    }, []);
-
-    const {id} = useParams()
-    const [pdfLink, setPdfLink] = useState("")
-
+    `
     // Get PDF link
     const fetchData = async () => {
-        console.log(useParams())
         try {
             const response = await fetch("/api/pdf?id=" + id);
             const data = await response.json();
@@ -37,27 +28,34 @@ export default function ResumeView(){
     };
     fetchData();
 
+    // Add dropbox viewer
+    useEffect(() => {
+        const script = document.createElement('script');
+
+        script.src = "https://www.dropbox.com/static/api/2/dropins.js";
+        script.async = true;
+        script.id = "dropboxjs";
+        script.setAttribute("data-app-key", import.meta.env.VITE_DROPBOX_CLIENT_ID);
+        document.body.appendChild(script);
+        return () => {
+            document.body.removeChild(script);
+        }
+    }, []);
+
     return(
-        <>
-            <TopBar />
-            <div className="ResumeViewContainer">
-                <div className="column">
-                    <a href={pdfLink} class="dropbox-embed"></a>
-                </div>
-                <div className="column">
-                    <DiscussionEmbed
-                        shortname={import.meta.env.VITE_DISQUS_SHORTNAME}
-                        config={
-                            {
-                                url: window.location.origin + window.location.pathname,
-                                identifier: id,
-                                title: "Resume Comments",
-                                language: 'en_US'
-                            }
-                        }
-                    />
-                </div>
-            </div>
-        </>
+        <main css={style}>
+            <a href={pdfLink} class="dropbox-embed"></a>
+            <DiscussionEmbed
+                shortname={import.meta.env.VITE_DISQUS_SHORTNAME}
+                config={
+                    {
+                        url: import.meta.env.VITE_BASE_URL+"r/"+id,
+                        identifier: id,
+                        title: "Resume Comments",
+                        language: 'en_US'
+                    }
+                }
+            />
+        </main>
     )
 }

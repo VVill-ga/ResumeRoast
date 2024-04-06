@@ -15,8 +15,8 @@ resumes using the Disqus thread linked to each document.
 ```toml
 DROPBOX_CLIENT_SECRET="{Get this from Dropbox}"
 VITE_DROPBOX_CLIENT_ID="{This is also from Dropbox}"
-VITE_OAUTH_REDIRECT_URL="{Your absolute path to /login (Like http://localhost:5173/login)}"
 VITE_DISQUS_SHORTNAME="{Get this from Disqus}"
+VITE_BASE_URL="{Your absolute path to / (Like http://localhost:5173/) including the trailing slash}"
 ```
 :runner: **Run this command!**
 ```bash
@@ -56,6 +56,9 @@ npm run build && npm run host # Builds and runs the server on port 5173
 
 ```json
 "status": 200,
+"body": {
+    "id": "{Dropbox User ID}"
+}
 ```
 
 **:arrow_up: /api/upload**

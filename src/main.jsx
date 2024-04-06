@@ -1,25 +1,39 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
 
-import App from './App.jsx'
+import Home from './pages/Home'
 import Login from './pages/Login'
 import Upload from './pages/Upload'
 import About from './pages/About'
+import ResumeView from './pages/ResumeView'
 
-import './index.css'
-import ResumeView from './pages/ResumeView.jsx'
+import TopBar from './components/TopBar'
+
+function Layout() {
+    return (
+        <>
+            <TopBar />
+            <Outlet />
+        </>
+    );
+}
 
 const router = createBrowserRouter([
-  { path: "/", element: <App /> },
-  { path: "/login", element: <Login /> },
-  { path: "/me", element: <Upload /> },
-  { path: "/r/:id", element: <ResumeView/> },
-  { path: "/about", element: <About /> }
+    {
+        element: <Layout />,
+        children: [
+            { path: "/", element: <Home /> },
+            { path: "/login", element: <Login /> },
+            { path: "/me", element: <Upload /> },
+            { path: "/r/:id", element: <ResumeView/> },
+            { path: "/about", element: <About /> }
+        ]
+    }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>,
+    <React.StrictMode>
+        <RouterProvider router={router} />
+    </React.StrictMode>
 )

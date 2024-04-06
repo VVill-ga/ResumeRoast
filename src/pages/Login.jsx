@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams, NavLink } from 'react-router-dom'
+import { useSearchParams, Navigate } from 'react-router-dom'
 import { useCookies } from 'react-cookie'
 
-import LoginLink from '../components/LoginLink'
-import TopBar from './TopBar'
+import Loading from '../components/Loading'
 
 export default function Login() {
     const [ error, setError ] = useState("")
+    const [ loading, setLoading ] = useState(true)
     const [ searchParams, setSearchParams ] = useSearchParams()
-    const [ success, setSuccess ] = useState(false)
-    const [ cookies, setCookie ] = useCookies(["authCode"])
+    const [ cookies, setCookie ] = useCookies(["authCode", "id"])
     const authCode = searchParams.get("code")
     
     useEffect(() => {
@@ -20,26 +19,27 @@ export default function Login() {
                 headers: {
                     "Content-Type": "application/json"
                 }
-            })
+            });
             if (res.status !== 200) {
-                setError("Error exchanging code for token")
+                setError("Error exchanging code for token");
             } else {
-                let expires = new Date()
-                expires.setTime(expires.getTime() + (14400000)) // Token lasts 4 hours
-                setCookie('authCode', authCode, {path: '/', expires})
-                setSuccess(true)
+                let expires = new Date();
+                expires.setTime(expires.getTime() + (14400000)); // Token lasts 4 hours
+                let resBody = await res.json();
+                setCookie('authCode', authCode, {path: '/', expires});
+                setCookie('id', resBody.id, {path: '/', expires});
             }
+            setLoading(false);
         }
         if (authCode) {
             exchangeForAccessToken(authCode)
         }
     }, [authCode, setCookie])
 
-    return (
-        <div>
-            <TopBar />
-            {error && !success && <p>Error: {error}</p>}
-            {success ? <p>Success! Now start  <NavLink to = "/me"> Uploading! </NavLink> </p> : <LoginLink />}
-        </div>
-    )
+    if(loading)
+        return <Loading/>
+    else if(error)
+        return <p>Error: {error}. Try pushing the login button again.</p>
+    else
+        return <Navigate to="/"/>
 }
