@@ -1,0 +1,14 @@
+[Unit]
+Description=Resume Roast Webserver
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/ResumeRoast/
+ExecStartPre=sh -c "npm i && npm run build"
+ExecStart=npm run host
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

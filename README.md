@@ -7,9 +7,7 @@ resumes using the Disqus thread linked to each document.
 
 ## Configuration and Hosting
 
-:octocat: **> git clone**
-
-:package: **> npm i**
+:octocat: **> git clone {this repo} /var/www/ResumeRoast**
 
 :page_facing_up: **Create .env.local**
 ```toml
@@ -18,9 +16,17 @@ VITE_DROPBOX_CLIENT_ID="{This is also from Dropbox}"
 VITE_DISQUS_SHORTNAME="{Get this from Disqus}"
 VITE_BASE_URL="{Your absolute path to / (Like http://localhost:8000/) including the trailing slash}"
 ```
-:runner: **Run this command!**
+:runner: **Run these commands!**
 ```bash
-npm run build && npm run host # Builds and runs the server on port 8000
+# edit roast.service if you cloned this repo to a different location
+cp roast.service /usr/lib/systemd/system/roast.service # Or wherever you store your service files
+sudo systemctl daemon-reload
+sudo systemctl enable roast
+sudo systemctl start roast
+```
+:no_good: **No Systemd? Run this instead:**
+```bash
+npm i && npm run build && npm run host # Builds and runs the server on port 8000
 ```
 ## Routes
 
