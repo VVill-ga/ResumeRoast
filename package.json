@@ -12,6 +12,7 @@
     "api": "nodemon server.js"
   },
   "dependencies": {
+    "@emotion/babel-plugin": "^11.11.0",
     "@emotion/react": "^11.11.4",
     "body-parser": "^1.20.2",
     "disqus-react": "^1.1.5",
