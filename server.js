@@ -10,7 +10,7 @@ dotenv.config({ path: ".env.local" })
 
 const client_id = process.env.VITE_DROPBOX_CLIENT_ID
 const client_secret = process.env.DROPBOX_CLIENT_SECRET
-const redirect_uri = process.env.VITE_OAUTH_REDIRECT_URL
+const redirect_uri = process.env.VITE_BASE_URL + "login"
 
 const app = express()
 const port = 8000
@@ -148,11 +148,11 @@ app.post("/api/upload", async (req, res) => {
             // Update database
             db.serialize(() => {
                 db.get("SELECT links FROM data WHERE id=?", [tokens[code].id], (err, entry) => {
-                    if(!err){
+                    if(!err && shareResBody && shareResBody.url){
                         if(!entry || !entry.links)
                             db.run("INSERT INTO data (id, links) VALUES (?, ?)", tokens[code].id, shareResBody.url)
                         else
-                            db.run("UPDATE data SET links=? WHERE id=?", [shareResBody.url + entry.links ? ',' + entry.links : "", tokens[code].id]);
+                            db.run("UPDATE data SET links=? WHERE id=?", [shareResBody.url + ',' + entry.links, tokens[code].id]);
                     }
                     else
                         console.log("Error updating links database: " + err);
