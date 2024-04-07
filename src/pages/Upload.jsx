@@ -14,6 +14,18 @@ export default function Upload() {
     const [ cookies, setCookie ] = useCookies(["authCode", "id"])
 
     const style = css`
+        >div {
+            height: 40vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: dashed 0.25em black;
+            margin: 2em;
+            p {
+                margin: 2em;
+                text-align: center;
+            }
+        }
     `
     
     const onDrop = useCallback((acceptedFiles) => {
@@ -49,9 +61,6 @@ export default function Upload() {
         reader.readAsArrayBuffer(file);
     }, [cookies.authCode])
 
-    if(loading)
-        return <Loading />
-
     const {getRootProps, getInputProps} = useDropzone({
         accept: {
             'application/pdf': ['.pdf']
@@ -61,11 +70,12 @@ export default function Upload() {
     })
 
     return (
+        loading? <Loading/> :
         <main css={style}>
             <div {...getRootProps()}>
                 <input {...getInputProps()} />
                 <p>
-                    { success && <NavLink to = "/"> File uploaded! </NavLink>}
+                    { success && "File uploaded!"}
                     {!success &&  error && "Error uploading resume, please try again"}
                     {!success && !error && "Drag 'n' drop your resume here, or click to select the file"}
                 </p>

@@ -10,10 +10,30 @@ export default function ResumeView(){
     const location = useLocation();
     const [cookies] = useCookies(["id"]);
     const {id} = location.pathname == '/me'? cookies : useParams();
-    console.log(location.pathname, id, cookies.id);
     const [pdfLink, setPdfLink] = useState("");
     const style = css`
-
+        display: flex;
+        margin: 2em;
+        #disqus_thread {
+            padding: 2em;
+        }
+        @media (orientation: landscape) {
+            .dropbox-embed-container {
+                width: 60%!important;
+                height: calc(100vh - 8.75em)!important;
+            }
+            #disqus_thread {
+                width: calc(40% - 4em);
+                height: calc(100vh - 12.75em);
+                overflow-y: auto;
+            }
+        }
+        @media (orientation: portrait) {
+            flex-direction: column;
+            .dropbox-embed-container{
+                aspect-ratio: 0.725
+            }
+        }
     `
     // Get PDF link
     const fetchData = async () => {

@@ -1,19 +1,49 @@
 import { useCookies } from 'react-cookie'
 import {NavLink, useLocation} from 'react-router-dom'
-import {css} from '@emotion/react'
+import {css, keyframes} from '@emotion/react'
 import { SlHome, SlSocialGithub, SlUser, SlLogin } from "react-icons/sl";
+
+const backgroundPhase = keyframes`
+    0% {
+        filter: hue-rotate(0deg)
+    }
+    100% {
+        filter: hue-rotate(360deg)
+    }
+`;
+const style = css`
+    background: linear-gradient(90deg, hsl(0 30% 70% / 1), hsl(45 30% 70% / 1));
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: solid 0.25em black;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    animation: ${backgroundPhase} 10s linear infinite;
+
+    h1{
+        font-size: 2em;
+        margin: 0;
+    }
+    a{
+        color: black;
+        width: 4.5em;
+        height: 4.5em;
+    }
+    svg{
+        width: 2.5em;
+        height: 2.5em;
+        margin: 1em;
+    }
+`;
 
 export default function TopBar(){
     const [ cookies, setCookie ] = useCookies(["authCode"]);
     const location = useLocation();
-    const style = css`
-        width: 100%;
-        background: hsl(${((new Date).getTime()/10000) % 360}, 30%, 70%);
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    `;
 
     const dropboxParams = new URLSearchParams({
         client_id: import.meta.env.VITE_DROPBOX_CLIENT_ID,
@@ -33,6 +63,7 @@ export default function TopBar(){
                     <SlHome />
                 </NavLink>
             }
+            <h1>Resume Roast</h1>
             {cookies.authCode ?
                 <NavLink to="/me">
                     <SlUser/>
