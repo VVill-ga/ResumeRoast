@@ -167,12 +167,12 @@ app.post("/api/upload", async (req, res) => {
 app.get("/api/allpdfs", async (req, res) => {
     let links = []
     db.serialize(() => {
-        db.get("SELECT * FROM data", (err, rows) => {
-            if(rows && rows.links) //Rows is a single pdf
-                links.push({id: rows.id, link: rows.links.split(",")[0]});
-            else if(rows)
-                for(let row of rows)
+        db.all("SELECT * FROM data", (err, rows) => {
+            if(rows){
+                rows.forEach((row) => {
                     links.push({id: row.id, link: row.links.split(",")[0]});
+                })
+            }
             res.status(links? 200:204).send(links)
         })
     })
