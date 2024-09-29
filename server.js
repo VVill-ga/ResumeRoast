@@ -3,8 +3,8 @@ import path from 'path';
 import dotenv from 'dotenv'
 import fs from 'fs'
 import bodyParser from 'body-parser'
-import pdf2img from 'pdf-img-convert'
 import sqlite3 from 'sqlite3'
+const pdf2img = await import("pdf-img-convert");
 
 dotenv.config({ path: ".env.local" })
 
